@@ -32,64 +32,64 @@ namespace StepTest
         private static void FailOnStep3(int seed, Result<Step1> first, Result<Step2> second, Result<Step3> third, int seed2)
         {
             var end4 = Result.Combine(first, second, third).
-                OnSuccess((res) => first.Value.Work(seed)).
-                OnSuccess((res) => second.Value.Work((seed + seed).ToString())).
-                OnSuccess((res) => third.Value.Work(decimal.Parse((seed2 + "." + seed)))).
-                OnSuccess((res) => { Console.WriteLine("ok"); return Result.Ok<string>("ok"); }).
-                OnFailure((res) => { Console.WriteLine("failed"); Console.WriteLine(res.Error); return Result.Fail<string>("failed"); }).
-                WhatEver((res) =>
+                OnSuccess(res => first.Value.Work(seed)).
+                OnSuccess(res => second.Value.Work((seed + seed).ToString())).
+                OnSuccess(res => third.Value.Work(decimal.Parse((seed2 + "." + seed)))).
+                OnSuccess(res => { Console.WriteLine("ok"); return "ok".ResultIsOk();}).//Result.Ok<string>("ok"); }).
+                OnFailure(res => { Console.WriteLine("failed"); Console.WriteLine(res.ErrorMessage); return "failed".ResultIsFailed("failed");}).//Result.Fail<string>("failed"); }).
+                WhatEver(res =>
                 {
-                    Console.WriteLine("in the end"); Console.WriteLine(res.Error);
+                    Console.WriteLine("in the end"); Console.WriteLine(res.ErrorMessage);
                     Console.WriteLine("!------------------------------------------------------------------!");
-                    return Result.Ok<string>("ok");
+                    return "ok".ResultIsOk();//Result.Ok<string>("ok");
                 });
         }
 
         private static void FailOnStep2Demo(int seed, Result<Step1> first, Result<Step2> second, Result<Step3> third, int seed2)
         {
             var end3 = Result.Combine(first, second, third).
-                OnSuccess((res) => first.Value.Work(seed)).
-                OnSuccess((res) => second.Value.Work((seed + seed2).ToString())).
-                OnSuccess((res) => third.Value.Work(decimal.Parse((seed + "." + seed)))).
-                OnSuccess((res) => { Console.WriteLine("ok"); return Result.Ok<string>("ok"); }).
-                OnFailure((res) => { Console.WriteLine("failed"); Console.WriteLine(res.Error); return Result.Fail<string>("failed"); }).
-                WhatEver((res) =>
+                OnSuccess(res => first.Value.Work(seed)).
+                OnSuccess(res => second.Value.Work((seed + seed2).ToString())).
+                OnSuccess(res => third.Value.Work(decimal.Parse((seed + "." + seed)))).
+                OnSuccess(res => { Console.WriteLine("ok"); return "ok".ResultIsOk();}).// Result.Ok<string>("ok"); }).
+                OnFailure(res => { Console.WriteLine("failed"); Console.WriteLine(res.ErrorMessage); return "failed".ResultIsFailed("failed"); }).//Result.Fail<string>("failed"); }).
+                WhatEver(res =>
                 {
-                    Console.WriteLine("in the end"); Console.WriteLine(res.Error);
+                    Console.WriteLine("in the end"); Console.WriteLine(res.ErrorMessage);
                     Console.WriteLine("!------------------------------------------------------------------!");
-                    return Result.Ok<string>("ok");
+                    return "ok".ResultIsOk();// Result.Ok<string>("ok");
                 });
         }
 
         private static void FailOnStep1Demo(int seed, Result<Step1> first, Result<Step2> second, Result<Step3> third, int seed2)
         {
             var end2 = Result.Combine(first, second, third).
-                OnSuccess((res) => first.Value.Work(seed2)).
-                OnSuccess((res) => second.Value.Work((seed + seed).ToString())).
-                OnSuccess((res) => third.Value.Work(decimal.Parse((seed + "." + seed)))).
-                OnSuccess((res) => { Console.WriteLine("ok"); return Result.Ok<string>("ok"); }).
-                OnFailure((res) => { Console.WriteLine("failed"); Console.WriteLine(res.Error); return Result.Fail<string>("failed"); }).
-                WhatEver((res) =>
+                OnSuccess(res => first.Value.Work(seed2)).
+                OnSuccess(res => second.Value.Work((seed + seed).ToString())).
+                OnSuccess(res => third.Value.Work(decimal.Parse((seed + "." + seed)))).
+                OnSuccess(res => { Console.WriteLine("ok"); return "ok".ResultIsOk(); }).//Result.Ok<string>("ok"); }).
+                OnFailure(res => { Console.WriteLine("failed"); Console.WriteLine(res.ErrorMessage); return "failed".ResultIsFailed("failed");}).// Result.Fail<string>("failed"); }).
+                WhatEver(res =>
                 {
-                    Console.WriteLine("in the end"); Console.WriteLine(res.Error);
+                    Console.WriteLine("in the end"); Console.WriteLine(res.ErrorMessage);
                     Console.WriteLine("!------------------------------------------------------------------!");
-                    return Result.Ok<string>("ok");
+                    return "ok".ResultIsOk();// Result.Ok<string>("ok");
                 });
         }
 
         private static void AllSuccessDemo(int seed, Result<Step1> first, Result<Step2> second, Result<Step3> third)
         {
             var end1 = Result.Combine(first, second, third).
-                OnSuccess((res) => first.Value.Work(seed)).
-                OnSuccess((res) => second.Value.Work((seed + seed).ToString())).
-                OnSuccess((res) => third.Value.Work(decimal.Parse((seed + "." + seed)))).
-                OnSuccess((res) => { Console.WriteLine("ok"); return Result.Ok<string>("ok"); }).
-                OnFailure((res) => { Console.WriteLine("failed"); Console.WriteLine(res.Error); return Result.Fail<string>("failed"); }).
-                WhatEver((res) =>
+                OnSuccess(res => first.Value.Work(seed)).
+                OnSuccess(res => second.Value.Work((seed + seed).ToString())).
+                OnSuccess(res => third.Value.Work(decimal.Parse((seed + "." + seed)))).
+                OnSuccess(res => { Console.WriteLine("ok"); return "ok".ResultIsOk();}).// }).
+                OnFailure(res => { Console.WriteLine("failed"); Console.WriteLine(res.ErrorMessage); return "failed".ResultIsFailed("failed"); }).
+                WhatEver(res =>
                 {
                     Console.WriteLine("in the end");
-                    Console.WriteLine(res.Error); Console.WriteLine("!------------------------------------------------------------------!");
-                    return Result.Ok<string>("ok");
+                    Console.WriteLine(res.ErrorMessage); Console.WriteLine("!------------------------------------------------------------------!");
+                    return "ok".ResultIsOk();// Result.Ok<string>("ok");
                 });
         }
     }
@@ -101,16 +101,20 @@ namespace StepTest
         protected Step1() { }
         public static Result<Step1> Create(int para)
         {
+            var resTmp =new Step1 { Para = para };
             return 
                 para > 10 && para < 20 ?
-                Result.Ok<Step1>(new Step1 { Para = para }) :
-                Result.Fail<Step1>("para can't less than 11 or greater than 19");
+                resTmp.ResultIsOk():
+                resTmp.ResultIsFailed("para can't less than 11 or greater than 19");
         }
 
         public Result<string> Work(int inPara)
         {
+            var resTmp = (Para + inPara).ToString();
             Console.WriteLine("in step1");
-            return Para.Equals(inPara) ? Result.Ok<string>((Para + inPara).ToString()):Result.Fail<string>("step1 need same inPara as para");
+            return Para.Equals(inPara) ? 
+                resTmp.ResultIsOk():
+                resTmp.ResultIsFailed("step1 need same inPara as para");
         }
     }
 
@@ -122,15 +126,19 @@ namespace StepTest
         {
             var res = 0;
             var parseTmp = int.TryParse(para, out res);
-
+            var resTmp = new Step2 { Para = para };
             return parseTmp ?
-                Result.Ok<Step2>(new Step2 { Para = para }) :
-                Result.Fail<Step2>("para should be int string");
+                resTmp.ResultIsOk():
+                resTmp.ResultIsFailed("para should be int string");
         }
         public Result<decimal> Work(string inPara)
         {
+            var resTmp = decimal.Parse((Para + "." + inPara));
             Console.WriteLine("in step2");
-            return Para.Equals(inPara) ? Result.Ok<decimal>(decimal.Parse((Para + "." + inPara))) : Result.Fail<decimal>("step2 need same inPara as para");
+            return Para.Equals(inPara) ?
+                resTmp.ResultIsOk():
+                resTmp.ResultIsFailed("step2 need same inPara as para");
+                //Result.Ok<decimal>(decimal.Parse((Para + "." + inPara))) : Result.Fail<decimal>("step2 need same inPara as para");
         }
     }
 
@@ -142,18 +150,20 @@ namespace StepTest
         {
             
             var res = para.ToString().Split('.');
-            
+            var resTmp = new Step3 { Para = para };
 
             return res.Length == 2 && res.First().Equals(res.Last()) ?
-                Result.Ok<Step3>(new Step3 { Para = para }) :
-                Result.Fail<Step3>("para should be a decimal with same integer part and decimal part");
+                resTmp.ResultIsOk():
+                resTmp.ResultIsFailed("para should be a decimal with same integer part and decimal part");
         }
         public Result<int> Work(decimal inPara)
         {
+            var resTmp = int.Parse(Para.ToString().Split('.').First() + int.Parse(inPara.ToString().Split('.').Last()));
             Console.WriteLine("in step3");
-            return Para.Equals(inPara) ? 
-                Result.Ok<int>(int.Parse(Para.ToString().Split('.').First() + int.Parse(inPara.ToString().Split('.').Last())))
-                : Result.Fail<int>("step3 need same inPara as para");
+            return Para.Equals(inPara) ?
+                resTmp.ResultIsOk():
+                resTmp.ResultIsFailed("step3 need same inPara as para");
+                //: Result.Fail<int>("step3 need same inPara as para");
         }
     }
 }
