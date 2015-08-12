@@ -8,14 +8,14 @@ namespace BlockHelp
 {
     public class BlockMethod
     {
-        public static T CodeBlockHelp<T>(Func<T> f) 
+        public static T CodeBlockHelp<T>(Func<T> f)
         {
             return f();
         }
 
-        public static bool IfElseHelp(Func<bool> flag, Action trueBlock, Action falseBlock) 
+        public static bool IfElseHelp(Func<bool> flag, Action trueBlock, Action falseBlock)
         {
-            return 
+            return
                 flag() ?
                 CodeBlockHelp<bool>(() => { trueBlock(); return true; }) :
                 CodeBlockHelp<bool>(() => { falseBlock(); return false; });
